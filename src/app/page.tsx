@@ -71,7 +71,7 @@ export default function HomePage() {
           {/* Left — lavender/dropper photo */}
           <div className="relative min-h-[320px] lg:min-h-0 order-2 lg:order-1">
             <Image
-              src="https://botanicalaid.com.au/wp-content/uploads/2025/06/iStock-1284076556-Steven-Granville.png"
+              src="/assets/hero-shop.png"
               alt="Natural botanical ingredients — essential oil dropper"
               fill
               unoptimized

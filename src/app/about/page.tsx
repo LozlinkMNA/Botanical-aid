@@ -41,7 +41,7 @@ export default function AboutPage() {
       {/* Hero */}
       <PageHero
         title="About Us"
-        imageUrl="https://botanicalaid.com.au/wp-content/uploads/2025/10/8441e90f182ccc825cebd6253b9dd5ff.jpg"
+        imageUrl="/assets/hero-about.jpg"
       />
 
       {/* Our Story */}

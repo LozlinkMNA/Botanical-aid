@@ -14,7 +14,7 @@ export default function TestimonialsPage() {
     <div>
       <PageHero
         title="Testimonials"
-        imageUrl="https://botanicalaid.com.au/wp-content/uploads/2025/06/iStock-1318440921-Surasak-Suwanmake.jpg"
+        imageUrl="/assets/hero-testimonials.jpg"
       />
       <div className="container mx-auto px-4 lg:px-6 py-12">
         <div className="text-center mb-12">

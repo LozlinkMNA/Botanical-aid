@@ -14,7 +14,7 @@ export default function FAQPage() {
     <div>
       <PageHero
         title="FAQs"
-        imageUrl="https://botanicalaid.com.au/wp-content/uploads/2025/06/iStock-1284076556-Steven-Granville.png"
+        imageUrl="/assets/hero-shop.png"
       />
       <div className="container mx-auto px-4 lg:px-6 py-12">
         <div className="text-center mb-12">

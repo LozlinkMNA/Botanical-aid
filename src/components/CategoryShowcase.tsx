@@ -19,7 +19,7 @@ export default function CategoryShowcase() {
             <Link href="/products?category=mental-health" className="group flex flex-col items-center gap-3">
               <div className="relative w-28 h-28 lg:w-36 lg:h-36 rounded-full overflow-hidden ring-4 ring-[#7c3aed] ring-offset-2 group-hover:ring-offset-4 transition-all shadow-lg">
                 <Image
-                  src="https://botanicalaid.com.au/wp-content/uploads/2025/06/iStock-1320983269-Tirachard-Lighter.png"
+                  src="/assets/category-post-treatment.png"
                   alt="Mental Health Range"
                   fill
                   unoptimized
@@ -35,7 +35,7 @@ export default function CategoryShowcase() {
             <Link href="/products?category=post-treatment" className="group flex flex-col items-center gap-3">
               <div className="relative w-28 h-28 lg:w-36 lg:h-36 rounded-full overflow-hidden ring-4 ring-[#0d9488] ring-offset-2 group-hover:ring-offset-4 transition-all shadow-lg">
                 <Image
-                  src="https://botanicalaid.com.au/wp-content/uploads/2025/06/iStock-2181645924-BongkarnThanyakij.png"
+                  src="/assets/category-mental-health.png"
                   alt="Post Treatment Skincare"
                   fill
                   unoptimized

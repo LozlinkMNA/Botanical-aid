@@ -14,7 +14,7 @@ export default function ContactPage() {
     <div>
       <PageHero
         title="Contact us"
-        imageUrl="https://botanicalaid.com.au/wp-content/uploads/2025/06/iStock-1437842817-Wirestock-scaled.jpg"
+        imageUrl="/assets/hero-contact.jpg"
       />
       <div className="container mx-auto px-4 lg:px-6 py-12">
         <div className="text-center mb-12">

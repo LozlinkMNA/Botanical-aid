@@ -53,7 +53,7 @@ export default function WhyChooseUs() {
         {/* Right — photo */}
         <div className="relative min-h-[320px] lg:min-h-0">
           <Image
-            src="https://botanicalaid.com.au/wp-content/uploads/2025/10/iStock-487443470-MoustacheGirl.jpg"
+            src="/assets/why-choose-us.jpg"
             alt="Natural wellness — butterfly on flower"
             fill
             unoptimized

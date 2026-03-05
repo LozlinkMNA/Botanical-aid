@@ -89,7 +89,7 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="flex-shrink-0 hover:opacity-90 transition-opacity">
               <Image
-                src="https://botanicalaid.com.au/wp-content/uploads/2025/06/01-1.png"
+                src="/assets/logo-white.png"
                 alt="Botanical Aid"
                 width={147}
                 height={51}

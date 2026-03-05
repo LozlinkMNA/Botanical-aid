@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const VIDEO_URL = 'https://botanicalaid.com.au/wp-content/uploads/2025/11/WhatsApp_Video_2025-11-21_at_10.23.55.mp4';
+const VIDEO_URL = '/assets/hero-video.mp4';
 
 const SLIDES = [
   {
     type: 'image' as const,
-    bg: 'https://botanicalaid.com.au/wp-content/uploads/2025/10/banner04.png-2-2.webp',
+    bg: '/assets/banner04.webp',
     bgPosition: 'left center',
     headline: 'Healing Through',
     subheadline: "Natures Touch.",
@@ -16,7 +16,7 @@ const SLIDES = [
   },
   {
     type: 'image' as const,
-    bg: 'https://botanicalaid.com.au/wp-content/uploads/2025/10/Generated_Image_November_142C_2025_-_6_34AM-2.webp',
+    bg: '/assets/banner02.webp',
     bgPosition: 'center center',
     headline: 'Botanical Aid.',
     subheadline: 'Pure Care, Naturally',
