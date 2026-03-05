@@ -43,8 +43,15 @@ export default function Hero() {
 
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
-    // Don't auto-advance on video slides — the video's onEnded handles it
-    if (SLIDES[current]?.type === 'video') return;
+    if (SLIDES[current]?.type === 'video') {
+      // onEnded / onError handle normal advancement; this is a last-resort fallback
+      // in case the video is blocked (e.g. CORS on production) and neither fires
+      timerRef.current = setTimeout(() => {
+        setIsAnimating(true);
+        setCurrent((prev) => (prev + 1) % total);
+      }, 15000) as unknown as ReturnType<typeof setInterval>;
+      return;
+    }
     timerRef.current = setInterval(() => {
       setIsAnimating(true);
       setCurrent((prev) => (prev + 1) % total);
@@ -116,6 +123,7 @@ export default function Hero() {
               playsInline
               className="h-full w-auto object-contain"
               onEnded={goNext}
+              onError={goNext}
             />
           </div>
         ) : (

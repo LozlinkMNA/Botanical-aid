@@ -20,4 +20,5 @@ export interface Product {
   usage: string;
   size: string;
   variants: ProductVariant[];
+  maxQuantity?: number;
 }

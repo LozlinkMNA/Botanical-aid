@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { stripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
-import { products as staticProducts } from '@/data/products';
+import { products as staticProducts, POST_TREATMENT_BUNDLE } from '@/data/products';
 
 function getAdminClient() {
   return createClient(
@@ -38,6 +38,21 @@ interface LineItem {
   price: number;
 }
 
+/** Resolve the line total for a static product, applying bundle pricing for MH products. */
+function getStaticLineTotal(productId: string, quantity: number): { price: number; name: string } | null {
+  const product = staticProducts.find((p) => p.id === productId);
+  if (!product) return null;
+
+  if (product.maxQuantity) {
+    const cappedQty = Math.min(quantity, product.maxQuantity);
+    const variant = product.variants.find((v) => v.quantity === cappedQty);
+    const total = variant ? variant.totalPrice : product.price * cappedQty;
+    return { price: total, name: product.name };
+  }
+
+  return { price: parseFloat((product.price * quantity).toFixed(2)), name: product.name };
+}
+
 export async function POST(request: Request) {
   try {
     const body: unknown = await request.json();
@@ -65,7 +80,7 @@ export async function POST(request: Request) {
       .eq('is_active', true);
 
     for (const item of items) {
-      let price: number;
+      let lineTotalDollars: number;
       let productName: string;
       let variantName: string | undefined;
 
@@ -81,35 +96,46 @@ export async function POST(request: Request) {
               { status: 400 }
             );
           }
-          price = variant.price;
+          lineTotalDollars = variant.price * item.quantity;
           productName = dbProduct.name;
           variantName = variant.name;
         } else {
-          price = dbProduct.price;
+          lineTotalDollars = dbProduct.price * item.quantity;
           productName = dbProduct.name;
         }
       } else {
-        // Fall back to static product data
-        const staticProduct = staticProducts.find((p) => p.id === item.productId);
-        if (!staticProduct) {
+        // Fall back to static product data with bundle pricing
+        const result = getStaticLineTotal(item.productId, item.quantity);
+        if (!result) {
           return NextResponse.json(
             { error: `Product not found: ${item.productId}` },
             { status: 400 }
           );
         }
-        price = staticProduct.price;
-        productName = staticProduct.name;
+        lineTotalDollars = result.price;
+        productName = result.name;
       }
 
-      totalCents += Math.round(price * 100) * item.quantity;
+      totalCents += Math.round(lineTotalDollars * 100);
       lineItems.push({
         productId: item.productId,
         variantId: item.variantId,
         name: productName,
         variantName,
         quantity: item.quantity,
-        price,
+        price: lineTotalDollars,
       });
+    }
+
+    // Apply post-treatment bundle discount (15 % when all three products present)
+    const bundleIds: readonly string[] = POST_TREATMENT_BUNDLE.productIds;
+    const hasAllBundle = bundleIds.every((id) => items.some((item) => item.productId === id));
+    if (hasAllBundle) {
+      const postTreatmentCents = lineItems
+        .filter((li) => bundleIds.includes(li.productId))
+        .reduce((sum, li) => sum + Math.round(li.price * 100), 0);
+      const discountCents = Math.round(postTreatmentCents * POST_TREATMENT_BUNDLE.discountPercent / 100);
+      totalCents -= discountCents;
     }
 
     const paymentIntent = await stripe.paymentIntents.create({

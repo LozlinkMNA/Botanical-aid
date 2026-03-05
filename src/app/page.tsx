@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Hero from '@/components/Hero';
 import CategoryShowcase from '@/components/CategoryShowcase';
 import ProductCard from '@/components/ProductCard';
+import PostTreatmentBundleBanner from '@/components/PostTreatmentBundleBanner';
 import WhyChooseUs from '@/components/WhyChooseUs';
 import FAQAccordion from '@/components/FAQAccordion';
 import { products } from '@/data/products';
@@ -45,6 +46,11 @@ export default function HomePage() {
             {postTreatmentProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
+          </div>
+
+          {/* Post Treatment Bundle Banner */}
+          <div className="max-w-3xl mx-auto mt-6">
+            <PostTreatmentBundleBanner />
           </div>
 
           <div className="text-center mt-10">

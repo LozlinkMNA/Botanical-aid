@@ -93,44 +93,59 @@ export default function ProductCard({ product }: { product: Product }) {
           ${product.price.toFixed(2)}
         </p>
 
-        {/* Quick-add with variant dropdown */}
-        <div className="mt-3 relative" ref={ref}>
-          <button
-            onClick={() => setOpen((o) => !o)}
-            className="w-full py-2 rounded text-xs font-bold text-white tracking-wide hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-1.5"
-            style={{ backgroundColor: '#1a3a8f' }}
-          >
-            ADD TO BAG
-            <svg className={`w-3 h-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M1 1l4 4 4-4" />
-            </svg>
-          </button>
+        {/* Quick-add — dropdown for multi-variant, direct add for single */}
+        {product.variants.length > 1 ? (
+          <div className="mt-3 relative" ref={ref}>
+            <button
+              onClick={() => setOpen((o) => !o)}
+              className="w-full py-2 rounded text-xs font-bold text-white tracking-wide hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-1.5"
+              style={{ backgroundColor: '#1a3a8f' }}
+            >
+              ADD TO BAG
+              <svg className={`w-3 h-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 1l4 4 4-4" />
+              </svg>
+            </button>
 
-          {/* Dropdown */}
-          {open && (
-            <div className="absolute bottom-full mb-1.5 left-0 right-0 z-30 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden">
-              {product.variants.map((variant) => (
-                <button
-                  key={variant.id}
-                  onClick={() => handleSelect(variant)}
-                  className="w-full text-left px-3 py-2.5 hover:bg-[#f0faf5] transition-colors border-b border-gray-50 last:border-0 cursor-pointer"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-gray-700 leading-snug flex-1">{variant.label}</span>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <span className="text-xs font-bold text-[#22a855]">${variant.totalPrice.toFixed(2)}</span>
-                      {variant.discountPercent > 0 && (
-                        <span className="text-[10px] font-bold text-white bg-[#22a855] px-1.5 py-0.5 rounded-full">
-                          {variant.discountPercent}% OFF
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+            {/* Dropdown */}
+            {open && (
+              <div className="absolute bottom-full mb-1.5 left-0 right-0 z-30 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden">
+                {product.variants.map((variant) => {
+                  const savings = parseFloat((product.price * variant.quantity - variant.totalPrice).toFixed(2));
+                  return (
+                    <button
+                      key={variant.id}
+                      onClick={() => handleSelect(variant)}
+                      className="w-full text-left px-3 py-2.5 hover:bg-[#f0faf5] transition-colors border-b border-gray-50 last:border-0 cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs text-gray-700 leading-snug flex-1">{variant.label}</span>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <span className="text-xs font-bold text-[#22a855]">${variant.totalPrice.toFixed(2)}</span>
+                          {savings > 0 && (
+                            <span className="text-[10px] font-bold text-white bg-[#22a855] px-1.5 py-0.5 rounded-full">
+                              Save ${savings.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mt-3">
+            <button
+              onClick={() => handleSelect(product.variants[0])}
+              className="w-full py-2 rounded text-xs font-bold text-white tracking-wide hover:opacity-90 transition-opacity cursor-pointer"
+              style={{ backgroundColor: '#1a3a8f' }}
+            >
+              ADD TO BAG
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

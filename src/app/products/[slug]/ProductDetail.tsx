@@ -76,65 +76,74 @@ export default function ProductDetail({ product }: { product: Product }) {
             <span className="text-sm text-muted-foreground">{product.size}</span>
           </div>
 
-          {/* Variant selector */}
-          <div className="mt-6 border border-gray-200 rounded-lg overflow-hidden">
-            {/* One-time purchase row */}
-            <label
-              className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
-                selectedVariant.id === 'single' ? 'bg-gray-50' : 'hover:bg-gray-50'
-              }`}
-            >
-              <input
-                type="radio"
-                name="variant"
-                value="single"
-                checked={selectedVariant.id === 'single'}
-                onChange={() => setSelectedVariant(product.variants[0])}
-                className="accent-[#1a3a8f] w-4 h-4"
-              />
-              <span className="text-sm font-medium text-gray-800">
-                One-time purchase
-              </span>
-              <span className="ml-auto text-sm font-semibold text-[#22a855]">
-                ${product.variants[0].totalPrice.toFixed(2)}
-              </span>
-            </label>
-
-            {/* Divider + bulk discount heading */}
-            <div className="border-t border-gray-200 px-4 py-2 bg-gray-50">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                Bulk purchase discount
-              </span>
-            </div>
-
-            {/* Bulk variants */}
-            {product.variants.slice(1).map((variant) => (
+          {/* Variant selector — only shown when there are bundle options */}
+          {product.variants.length > 1 ? (
+            <div className="mt-6 border border-gray-200 rounded-lg overflow-hidden">
+              {/* One-time purchase row */}
               <label
-                key={variant.id}
-                className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-t border-gray-100 ${
-                  selectedVariant.id === variant.id ? 'bg-blue-50' : 'hover:bg-gray-50'
+                className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                  selectedVariant.id === 'single' ? 'bg-gray-50' : 'hover:bg-gray-50'
                 }`}
               >
                 <input
                   type="radio"
                   name="variant"
-                  value={variant.id}
-                  checked={selectedVariant.id === variant.id}
-                  onChange={() => setSelectedVariant(variant)}
+                  value="single"
+                  checked={selectedVariant.id === 'single'}
+                  onChange={() => setSelectedVariant(product.variants[0])}
                   className="accent-[#1a3a8f] w-4 h-4"
                 />
-                <span className="text-sm text-gray-800 flex-1">
-                  {variant.label}
+                <span className="text-sm font-medium text-gray-800">
+                  One-time purchase
                 </span>
-                <span className="text-sm font-semibold text-[#22a855]">
-                  ${variant.totalPrice.toFixed(2)}
-                </span>
-                <span className="text-xs font-bold text-white bg-[#22a855] px-2 py-0.5 rounded-full">
-                  {variant.discountPercent}% OFF
+                <span className="ml-auto text-sm font-semibold text-[#22a855]">
+                  ${product.variants[0].totalPrice.toFixed(2)}
                 </span>
               </label>
-            ))}
-          </div>
+
+              {/* Divider + bundle heading */}
+              <div className="border-t border-gray-200 px-4 py-2 bg-gray-50">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Bundle options
+                </span>
+              </div>
+
+              {/* Bundle variants */}
+              {product.variants.slice(1).map((variant) => {
+                const savings = parseFloat((product.price * variant.quantity - variant.totalPrice).toFixed(2));
+                return (
+                  <label
+                    key={variant.id}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-t border-gray-100 ${
+                      selectedVariant.id === variant.id ? 'bg-blue-50' : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="variant"
+                      value={variant.id}
+                      checked={selectedVariant.id === variant.id}
+                      onChange={() => setSelectedVariant(variant)}
+                      className="accent-[#1a3a8f] w-4 h-4"
+                    />
+                    <span className="text-sm text-gray-800 flex-1">
+                      {variant.label}
+                    </span>
+                    <span className="text-sm font-semibold text-[#22a855]">
+                      ${variant.totalPrice.toFixed(2)}
+                    </span>
+                    <span className="text-xs font-bold text-white bg-[#22a855] px-2 py-0.5 rounded-full">
+                      Save ${savings.toFixed(2)}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="mt-6">
+              <span className="text-sm text-muted-foreground">Per unit</span>
+            </div>
+          )}
 
           {/* Free shipping note */}
           <div className="flex items-center gap-2 mt-3 text-[#22a855] text-sm font-medium">

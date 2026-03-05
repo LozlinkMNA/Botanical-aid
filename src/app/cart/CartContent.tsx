@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Minus, Plus, Trash2, ShoppingBag, Tag } from 'lucide-react';
-import { useCart, getEffectiveUnitPrice, getDiscountPercent, unitsToNextTier } from '@/contexts/CartContext';
+import { useCart, getLineTotal, getLineSavings, getPostTreatmentBundleDiscount } from '@/contexts/CartContext';
 
 export default function CartContent() {
   const { items, updateQuantity, removeFromCart, getCartTotal } = useCart();
@@ -23,25 +23,25 @@ export default function CartContent() {
     );
   }
 
-  const subtotal = getCartTotal();
-  const isFreeShipping = subtotal >= 99;
+  const cartTotal = getCartTotal();
+  const isFreeShipping = cartTotal >= 99;
   const shipping = isFreeShipping ? 0 : 9.95;
-  const total = subtotal + shipping;
+  const total = parseFloat((cartTotal + shipping).toFixed(2));
 
-  // Total savings across all items
+  // Savings breakdown
   const fullTotal = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
-  const totalSavings = parseFloat((fullTotal - subtotal).toFixed(2));
+  const itemSubtotal = items.reduce((sum, i) => sum + getLineTotal(i.product, i.quantity), 0);
+  const mhSavings = parseFloat((fullTotal - itemSubtotal).toFixed(2));
+  const bundleDiscount = getPostTreatmentBundleDiscount(items);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Cart Items */}
       <div className="lg:col-span-2 space-y-4">
         {items.map((item) => {
-          const basePrice = item.product.price;
-          const unitPrice = getEffectiveUnitPrice(basePrice, item.quantity);
-          const discount = getDiscountPercent(item.quantity);
-          const nextTier = unitsToNextTier(item.quantity);
-          const lineTotal = parseFloat((unitPrice * item.quantity).toFixed(2));
+          const lineTotal = getLineTotal(item.product, item.quantity);
+          const savings = getLineSavings(item.product, item.quantity);
+          const atMax = item.product.maxQuantity != null && item.quantity >= item.product.maxQuantity;
 
           return (
             <div key={item.product.id} className="p-4 bg-card border border-border rounded-lg">
@@ -63,16 +63,18 @@ export default function CartContent() {
                   </Link>
                   <p className="text-sm text-muted-foreground">{item.product.size}</p>
 
-                  {/* Price with discount */}
+                  {/* Price */}
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-sm font-semibold text-[#22a855]">
-                      ${unitPrice.toFixed(2)} each
+                      ${lineTotal.toFixed(2)}
                     </span>
-                    {discount > 0 && (
+                    {savings > 0 && (
                       <>
-                        <span className="text-xs text-muted-foreground line-through">${basePrice.toFixed(2)}</span>
+                        <span className="text-xs text-muted-foreground line-through">
+                          ${(item.product.price * item.quantity).toFixed(2)}
+                        </span>
                         <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-white bg-[#22a855] px-1.5 py-0.5 rounded-full">
-                          <Tag className="h-2.5 w-2.5" />{discount}% OFF
+                          <Tag className="h-2.5 w-2.5" />Save ${savings.toFixed(2)}
                         </span>
                       </>
                     )}
@@ -99,7 +101,8 @@ export default function CartContent() {
                     <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                      className="h-8 w-8 inline-flex items-center justify-center hover:bg-muted/50 transition-colors cursor-pointer"
+                      disabled={atMax}
+                      className="h-8 w-8 inline-flex items-center justify-center hover:bg-muted/50 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                       aria-label="Increase"
                     >
                       <Plus className="h-3 w-3" />
@@ -110,15 +113,15 @@ export default function CartContent() {
                 </div>
               </div>
 
-              {/* Tier nudge — shown below the item row */}
-              {nextTier && (
-                <p className="mt-2 text-xs text-[#1a3a8f] bg-blue-50 rounded px-3 py-1.5">
-                  Add <strong>{nextTier.units} more</strong> of this product to unlock <strong>{nextTier.nextDiscount}% off</strong> automatically
+              {/* Bundle info */}
+              {savings > 0 && (
+                <p className="mt-2 text-xs text-[#22a855] bg-green-50 rounded px-3 py-1.5">
+                  Bundle savings applied — you&apos;re saving ${savings.toFixed(2)} on this item
                 </p>
               )}
-              {discount > 0 && (
-                <p className="mt-2 text-xs text-[#22a855] bg-green-50 rounded px-3 py-1.5">
-                  🎉 {discount}% volume discount applied — you&apos;re saving ${(( basePrice - unitPrice) * item.quantity).toFixed(2)} on this item
+              {atMax && (
+                <p className="mt-2 text-xs text-muted-foreground bg-muted rounded px-3 py-1.5">
+                  Maximum of {item.product.maxQuantity} per order
                 </p>
               )}
             </div>
@@ -134,12 +137,18 @@ export default function CartContent() {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium text-foreground">${subtotal.toFixed(2)}</span>
+              <span className="font-medium text-foreground">${itemSubtotal.toFixed(2)}</span>
             </div>
-            {totalSavings > 0 && (
+            {mhSavings > 0 && (
               <div className="flex justify-between text-[#22a855]">
-                <span className="flex items-center gap-1"><Tag className="h-3 w-3" />Volume savings</span>
-                <span className="font-semibold">−${totalSavings.toFixed(2)}</span>
+                <span className="flex items-center gap-1"><Tag className="h-3 w-3" />Bundle savings</span>
+                <span className="font-semibold">-${mhSavings.toFixed(2)}</span>
+              </div>
+            )}
+            {bundleDiscount > 0 && (
+              <div className="flex justify-between text-[#22a855]">
+                <span className="flex items-center gap-1"><Tag className="h-3 w-3" />Post Treatment Bundle (15% off)</span>
+                <span className="font-semibold">-${bundleDiscount.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between">
@@ -150,7 +159,7 @@ export default function CartContent() {
             </div>
             {!isFreeShipping && (
               <p className="text-xs text-muted-foreground">
-                Add ${(99 - subtotal).toFixed(2)} more for free shipping
+                Add ${(99 - cartTotal).toFixed(2)} more for free shipping
               </p>
             )}
             <div className="border-t border-border pt-3 flex justify-between">

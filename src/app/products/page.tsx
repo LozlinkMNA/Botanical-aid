@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { products, getProductsByCategory } from '@/data/products';
 import type { Product } from '@/types/product';
 import ProductCard from '@/components/ProductCard';
+import PostTreatmentBundleBanner from '@/components/PostTreatmentBundleBanner';
 import ProductFilter from './ProductFilter';
 import PageHero from '@/components/PageHero';
 
@@ -52,11 +53,23 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
       <ProductFilter currentCategory={category} />
 
+      {category === 'post-treatment' && (
+        <div className="mt-8">
+          <PostTreatmentBundleBanner />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
         {filteredProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
+
+      {(!category || category === 'mental-health') && (
+        <div className="mt-8">
+          <PostTreatmentBundleBanner />
+        </div>
+      )}
 
       {filteredProducts.length === 0 && (
         <div className="text-center py-16">

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useCart, getEffectiveUnitPrice } from '@/contexts/CartContext';
+import { useCart, getLineTotal, getPostTreatmentBundleDiscount } from '@/contexts/CartContext';
 import { ShoppingBag, ArrowLeft, Loader2, Lock } from 'lucide-react';
 
 const stripePromise = loadStripe(
@@ -383,19 +383,28 @@ export default function CheckoutPage() {
             <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
             <div className="space-y-3 mb-4">
               {items.map((item) => {
-                const unitPrice = getEffectiveUnitPrice(item.product.price, item.quantity);
+                const lineTotal = getLineTotal(item.product, item.quantity);
                 return (
                   <div key={item.product.id} className="flex justify-between text-sm">
                     <span>
                       {item.product.name} x {item.quantity}
                     </span>
                     <span className="font-medium">
-                      ${(unitPrice * item.quantity).toFixed(2)}
+                      ${lineTotal.toFixed(2)}
                     </span>
                   </div>
                 );
               })}
             </div>
+            {(() => {
+              const bundleDiscount = getPostTreatmentBundleDiscount(items);
+              return bundleDiscount > 0 ? (
+                <div className="flex justify-between text-sm text-[#22a855] mb-2">
+                  <span>Post Treatment Bundle (15% off)</span>
+                  <span className="font-semibold">-${bundleDiscount.toFixed(2)}</span>
+                </div>
+              ) : null;
+            })()}
             <div className="border-t pt-3">
               <div className="flex justify-between text-sm text-muted-foreground mb-1">
                 <span>Shipping</span>

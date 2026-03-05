@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { products, getProductBySlug, getProductsByCategory } from '@/data/products';
 import ProductDetail from './ProductDetail';
 import ProductCard from '@/components/ProductCard';
+import PostTreatmentBundleBanner from '@/components/PostTreatmentBundleBanner';
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -41,6 +42,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="container mx-auto px-4 lg:px-6 py-12">
       <ProductDetail product={product} />
+
+      {product.category === 'post-treatment' && (
+        <div className="mt-10">
+          <PostTreatmentBundleBanner />
+        </div>
+      )}
 
       {relatedProducts.length > 0 && (
         <section className="mt-16">
