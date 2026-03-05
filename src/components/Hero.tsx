@@ -117,8 +117,9 @@ export default function Hero() {
             style={{ opacity: i === current ? 1 : 0 }}
           >
             <video
-              src={slide.bg}
-              autoPlay
+              key={i === current ? `vid-active-${current}` : `vid-idle-${i}`}
+              src={i === current ? slide.bg : undefined}
+              autoPlay={i === current}
               muted
               playsInline
               className="h-full w-auto object-contain"

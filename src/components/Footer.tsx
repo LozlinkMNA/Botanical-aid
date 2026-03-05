@@ -13,22 +13,14 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <div className="mb-4">
               {/* White version of logo — use a text+icon fallback styled to match */}
-              <div className="flex flex-col items-start">
-                <svg width="60" height="60" viewBox="0 0 100 100" className="mb-2" fill="white" xmlns="http://www.w3.org/2000/svg">
-                  <g>
-                    <path d="M50 10 C50 10 30 25 30 45 C30 58 38 68 50 72 C62 68 70 58 70 45 C70 25 50 10 50 10Z" opacity="0.9"/>
-                    <path d="M50 30 L50 72" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-                    <path d="M50 45 C50 45 36 38 28 28" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                    <path d="M50 50 C50 50 64 43 72 33" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                    <circle cx="50" cy="82" r="4" opacity="0.7"/>
-                    <circle cx="44" cy="90" r="3" opacity="0.5"/>
-                    <circle cx="56" cy="90" r="3" opacity="0.5"/>
-                  </g>
-                </svg>
-                <span className="text-white font-bold text-xl tracking-wide" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-                  Botanical Aid
-                </span>
-              </div>
+              <Image
+                src="/assets/logo-white.png"
+                alt="Botanical Aid"
+                width={160}
+                height={60}
+                unoptimized
+                className="mb-2"
+              />
             </div>
           </div>
 
